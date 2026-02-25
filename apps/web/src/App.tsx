@@ -1,7 +1,16 @@
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { Providers } from './components/providers';
+import { Toaster } from './components/ui/sonner';
+
 export function App() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-gray-50">
-      <h1 className="text-3xl font-bold text-gray-900">ActivaCom Admin Panel</h1>
-    </div>
+    <Providers>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/" element={<div>Dashboard</div>} />
+        </Routes>
+      </BrowserRouter>
+      <Toaster />
+    </Providers>
   );
 }
