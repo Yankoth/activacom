@@ -1,0 +1,21 @@
+{
+  "name": "activacom",
+  "private": true,
+  "pnpm": {
+    "onlyBuiltDependencies": ["esbuild"]
+  },
+  "scripts": {
+    "dev": "pnpm -r --parallel dev",
+    "dev:web": "pnpm --filter @activacom/web dev",
+    "dev:register": "pnpm --filter @activacom/register dev",
+    "dev:display": "pnpm --filter @activacom/display dev",
+    "dev:landing": "pnpm --filter @activacom/landing dev",
+    "build": "pnpm --filter @activacom/shared build && pnpm -r --parallel --filter !@activacom/shared build",
+    "build:web": "pnpm --filter @activacom/shared build && pnpm --filter @activacom/web build",
+    "build:register": "pnpm --filter @activacom/shared build && pnpm --filter @activacom/register build",
+    "build:display": "pnpm --filter @activacom/shared build && pnpm --filter @activacom/display build",
+    "build:landing": "pnpm --filter @activacom/landing build",
+    "lint": "pnpm -r --parallel lint",
+    "typecheck": "pnpm -r --parallel typecheck"
+  }
+}

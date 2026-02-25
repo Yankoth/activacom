@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(cd:*)",
+      "WebSearch",
+      "WebFetch(domain:ui.shadcn.com)",
+      "WebFetch(domain:pnpm.io)",
+      "WebFetch(domain:www.npmjs.com)",
+      "Bash(pnpm info @tailwindcss/vite peerDependencies 2>/dev/null || npm info @tailwindcss/vite peerDependencies 2>/dev/null)",
+      "Bash(pnpm info:*)",
+      "Bash(true:*)"
+    ]
+  }
+}
