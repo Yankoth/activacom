@@ -11,34 +11,38 @@ CREATE EXTENSION IF NOT EXISTS "pgcrypto";
 
 CREATE OR REPLACE FUNCTION public.get_user_tenant_id()
 RETURNS UUID
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-  SELECT tenant_id FROM public.users WHERE id = auth.uid();
+BEGIN
+  RETURN (SELECT tenant_id FROM public.users WHERE id = auth.uid());
+END;
 $$;
 
 CREATE OR REPLACE FUNCTION public.get_user_role()
 RETURNS TEXT
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-  SELECT role FROM public.users WHERE id = auth.uid();
+BEGIN
+  RETURN (SELECT role FROM public.users WHERE id = auth.uid());
+END;
 $$;
 
 CREATE OR REPLACE FUNCTION public.is_super_admin()
 RETURNS BOOLEAN
-LANGUAGE sql
+LANGUAGE plpgsql
 STABLE
 SECURITY DEFINER
 SET search_path = public
 AS $$
-  SELECT EXISTS (
-    SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'super_admin'
-  );
+BEGIN
+  RETURN EXISTS (SELECT 1 FROM public.users WHERE id = auth.uid() AND role = 'super_admin');
+END;
 $$;
 
 -- ── 3. updated_at trigger function ──────────────────────────────────────────
