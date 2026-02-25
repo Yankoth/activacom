@@ -578,7 +578,17 @@ export interface Database {
       };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      create_tenant_with_admin: {
+        Args: {
+          p_user_id: string;
+          p_tenant_name: string;
+          p_tenant_slug: string;
+          p_tenant_type: string;
+        };
+        Returns: string;
+      };
+    };
   };
 }
 

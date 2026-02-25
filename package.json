@@ -2,7 +2,10 @@
   "name": "activacom",
   "private": true,
   "pnpm": {
-    "onlyBuiltDependencies": ["esbuild"]
+    "onlyBuiltDependencies": ["esbuild"],
+    "overrides": {
+      "zod": "4.3.6"
+    }
   },
   "scripts": {
     "dev": "pnpm -r --parallel dev",

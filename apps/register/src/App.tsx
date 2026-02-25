@@ -1,24 +1,9 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-
-function SlugRedirect() {
-  return <div>Redirect by slug</div>;
-}
-
-function EventRegistration() {
-  return <div>Registration form</div>;
-}
-
-function ThankYou() {
-  return <div>Thank you</div>;
-}
-
-function Verify() {
-  return <div>Verification</div>;
-}
-
-function Unsubscribe() {
-  return <div>Unsubscribe</div>;
-}
+import SlugRedirect from './pages/SlugRedirect';
+import EventRegistration from './pages/EventRegistration';
+import ThankYou from './pages/ThankYou';
+import Verify from './pages/Verify';
+import Unsubscribe from './pages/Unsubscribe';
 
 export function App() {
   return (
