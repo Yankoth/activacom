@@ -13,6 +13,9 @@ import type {
   AdImpressionType,
   VerificationTokenType,
   DisplayState,
+  CampaignType,
+  CampaignStatus,
+  CampaignMessageStatus,
 } from '../types';
 
 // ── Enum arrays ─────────────────────────────────────────────────────────────
@@ -31,6 +34,9 @@ export const CREDIT_TRANSACTION_TYPES: CreditTransactionType[] = ['purchase', 'c
 export const AD_IMPRESSION_TYPES: AdImpressionType[] = ['view', 'click'];
 export const VERIFICATION_TOKEN_TYPES: VerificationTokenType[] = ['email', 'phone'];
 export const DISPLAY_STATES: DisplayState[] = ['PLACEHOLDER', 'PHOTOS', 'WINNER', 'IDLE'];
+export const CAMPAIGN_TYPES: CampaignType[] = ['sms', 'email'];
+export const CAMPAIGN_STATUSES: CampaignStatus[] = ['draft', 'scheduled', 'sending', 'sent', 'cancelled'];
+export const CAMPAIGN_MESSAGE_STATUSES: CampaignMessageStatus[] = ['pending', 'sent', 'delivered', 'failed', 'bounced'];
 
 // ── Numeric constants ───────────────────────────────────────────────────────
 

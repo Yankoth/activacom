@@ -14,6 +14,9 @@ export type CreditTransactionType = 'purchase' | 'consumption' | 'refund' | 'bon
 export type AdImpressionType = 'view' | 'click';
 export type VerificationTokenType = 'email' | 'phone';
 export type DisplayState = 'PLACEHOLDER' | 'PHOTOS' | 'WINNER' | 'IDLE';
+export type CampaignType = 'sms' | 'email';
+export type CampaignStatus = 'draft' | 'scheduled' | 'sending' | 'sent' | 'cancelled';
+export type CampaignMessageStatus = 'pending' | 'sent' | 'delivered' | 'failed' | 'bounced';
 
 // ── Database type (Supabase GenericSchema) ──────────────────────────────────
 
@@ -499,6 +502,80 @@ export interface Database {
         };
         Relationships: [];
       };
+      campaigns: {
+        Row: {
+          id: string;
+          tenant_id: string;
+          name: string;
+          type: CampaignType;
+          subject: string | null;
+          body: string | null;
+          status: CampaignStatus;
+          recipient_count: number;
+          scheduled_at: string | null;
+          sent_at: string | null;
+          created_at: string;
+          updated_at: string;
+        };
+        Insert: {
+          id?: string;
+          tenant_id: string;
+          name: string;
+          type: CampaignType;
+          subject?: string | null;
+          body?: string | null;
+          status?: CampaignStatus;
+          recipient_count?: number;
+          scheduled_at?: string | null;
+          sent_at?: string | null;
+          created_at?: string;
+          updated_at?: string;
+        };
+        Update: {
+          tenant_id?: string;
+          name?: string;
+          type?: CampaignType;
+          subject?: string | null;
+          body?: string | null;
+          status?: CampaignStatus;
+          recipient_count?: number;
+          scheduled_at?: string | null;
+          sent_at?: string | null;
+          updated_at?: string;
+        };
+        Relationships: [];
+      };
+      campaign_messages: {
+        Row: {
+          id: string;
+          campaign_id: string;
+          contact_id: string;
+          status: CampaignMessageStatus;
+          sent_at: string | null;
+          delivered_at: string | null;
+          error_message: string | null;
+          created_at: string;
+        };
+        Insert: {
+          id?: string;
+          campaign_id: string;
+          contact_id: string;
+          status?: CampaignMessageStatus;
+          sent_at?: string | null;
+          delivered_at?: string | null;
+          error_message?: string | null;
+          created_at?: string;
+        };
+        Update: {
+          campaign_id?: string;
+          contact_id?: string;
+          status?: CampaignMessageStatus;
+          sent_at?: string | null;
+          delivered_at?: string | null;
+          error_message?: string | null;
+        };
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -522,6 +599,8 @@ export type License = Database['public']['Tables']['licenses']['Row'];
 export type Ad = Database['public']['Tables']['ads']['Row'];
 export type AdImpression = Database['public']['Tables']['ad_impressions']['Row'];
 export type VerificationToken = Database['public']['Tables']['verification_tokens']['Row'];
+export type Campaign = Database['public']['Tables']['campaigns']['Row'];
+export type CampaignMessage = Database['public']['Tables']['campaign_messages']['Row'];
 
 // Insert aliases
 export type TenantInsert = Database['public']['Tables']['tenants']['Insert'];
@@ -538,6 +617,8 @@ export type LicenseInsert = Database['public']['Tables']['licenses']['Insert'];
 export type AdInsert = Database['public']['Tables']['ads']['Insert'];
 export type AdImpressionInsert = Database['public']['Tables']['ad_impressions']['Insert'];
 export type VerificationTokenInsert = Database['public']['Tables']['verification_tokens']['Insert'];
+export type CampaignInsert = Database['public']['Tables']['campaigns']['Insert'];
+export type CampaignMessageInsert = Database['public']['Tables']['campaign_messages']['Insert'];
 
 // Update aliases
 export type TenantUpdate = Database['public']['Tables']['tenants']['Update'];
@@ -554,6 +635,8 @@ export type LicenseUpdate = Database['public']['Tables']['licenses']['Update'];
 export type AdUpdate = Database['public']['Tables']['ads']['Update'];
 export type AdImpressionUpdate = Database['public']['Tables']['ad_impressions']['Update'];
 export type VerificationTokenUpdate = Database['public']['Tables']['verification_tokens']['Update'];
+export type CampaignUpdate = Database['public']['Tables']['campaigns']['Update'];
+export type CampaignMessageUpdate = Database['public']['Tables']['campaign_messages']['Update'];
 
 // ── Edge Function input/response types ──────────────────────────────────────
 
