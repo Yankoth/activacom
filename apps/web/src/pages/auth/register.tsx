@@ -92,9 +92,18 @@ export default function RegisterPage() {
   const onSubmit = async (data: RegisterForm) => {
     setError(null);
     try {
+      const slug = slugify(data.businessName);
+
       const { data: authData, error: signUpError } = await supabase.auth.signUp({
         email: data.email,
         password: data.password,
+        options: {
+          data: {
+            business_name: data.businessName,
+            business_slug: slug,
+            business_type: data.type,
+          },
+        },
       });
 
       if (signUpError) throw signUpError;
@@ -102,13 +111,13 @@ export default function RegisterPage() {
       const user = authData.user;
       if (!user) throw new Error('No se pudo crear el usuario');
 
-      // If email confirmation is required, the session won't exist yet
+      // If email confirmation is required, the session won't exist yet.
+      // Business info is stored in user_metadata and will be used to
+      // create the tenant on first login (see auth-store.ts).
       if (!authData.session) {
         setEmailSent(true);
         return;
       }
-
-      const slug = slugify(data.businessName);
 
       const { error: rpcError } = await supabase.rpc('create_tenant_with_admin', {
         p_user_id: user.id,

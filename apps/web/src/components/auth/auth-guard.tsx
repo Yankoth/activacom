@@ -18,16 +18,8 @@ export function AuthGuard({ children }: AuthGuardProps) {
     );
   }
 
-  if (!session) {
+  if (!session || (!user && isInitialized && !isLoading)) {
     return <Navigate to="/auth/login" state={{ from: location.pathname }} replace />;
-  }
-
-  if (!user) {
-    return (
-      <div className="flex h-screen items-center justify-center">
-        <Loader2 className="text-muted-foreground h-8 w-8 animate-spin" />
-      </div>
-    );
   }
 
   return <>{children}</>;
