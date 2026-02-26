@@ -1,69 +1,69 @@
-import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Skeleton } from '@/components/ui/skeleton';
+import {
+  EventHeader,
+  EventSummaryTab,
+  EventParticipantsTab,
+  EventSettingsTab,
+  WinnerDialog,
+} from '@/components/events';
+import { useEvent } from '@/hooks/use-events';
 
 export default function EventDetailPage() {
   const { id } = useParams<{ id: string }>();
+  const { data: event, isLoading } = useEvent(id!);
+  const [winnerDialogOpen, setWinnerDialogOpen] = useState(false);
+
+  if (isLoading) {
+    return (
+      <div className="space-y-6">
+        <Skeleton className="h-12 w-96" />
+        <Skeleton className="h-[400px] w-full" />
+      </div>
+    );
+  }
+
+  if (!event) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <p className="text-muted-foreground">Evento no encontrado</p>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" asChild>
-          <Link to="/events">
-            <ArrowLeft className="size-4" />
-          </Link>
-        </Button>
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight">Detalle del evento</h1>
-          <p className="text-muted-foreground text-sm">ID: {id}</p>
-        </div>
-      </div>
+      <EventHeader
+        event={event}
+        onSelectWinner={
+          event.status === 'closed' ? () => setWinnerDialogOpen(true) : undefined
+        }
+      />
 
-      <Tabs defaultValue="general">
+      <Tabs defaultValue="summary">
         <TabsList>
-          <TabsTrigger value="general">General</TabsTrigger>
+          <TabsTrigger value="summary">Resumen</TabsTrigger>
           <TabsTrigger value="participants">Participantes</TabsTrigger>
-          <TabsTrigger value="form">Formulario</TabsTrigger>
+          <TabsTrigger value="settings">Configuracion</TabsTrigger>
         </TabsList>
-        <TabsContent value="general">
-          <Card>
-            <CardHeader>
-              <CardTitle>Informacion del evento</CardTitle>
-              <CardDescription>Los detalles del evento se mostraran aqui.</CardDescription>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              {Array.from({ length: 3 }).map((_, i) => (
-                <Skeleton key={i} className="h-10 w-full" />
-              ))}
-            </CardContent>
-          </Card>
+        <TabsContent value="summary" className="mt-4">
+          <EventSummaryTab event={event} />
         </TabsContent>
-        <TabsContent value="participants">
-          <Card>
-            <CardHeader>
-              <CardTitle>Participantes</CardTitle>
-              <CardDescription>La lista de participantes se mostrara aqui.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-[200px] w-full" />
-            </CardContent>
-          </Card>
+        <TabsContent value="participants" className="mt-4">
+          <EventParticipantsTab eventId={event.id} eventName={event.name} />
         </TabsContent>
-        <TabsContent value="form">
-          <Card>
-            <CardHeader>
-              <CardTitle>Formulario</CardTitle>
-              <CardDescription>El constructor de formularios estara aqui.</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Skeleton className="h-[200px] w-full" />
-            </CardContent>
-          </Card>
+        <TabsContent value="settings" className="mt-4">
+          <EventSettingsTab event={event} />
         </TabsContent>
       </Tabs>
+
+      <WinnerDialog
+        eventId={event.id}
+        open={winnerDialogOpen}
+        onOpenChange={setWinnerDialogOpen}
+      />
     </div>
   );
 }

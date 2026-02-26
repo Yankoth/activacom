@@ -1,8 +1,7 @@
 import { Link } from 'react-router-dom';
 import { ArrowLeft } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Skeleton } from '@/components/ui/skeleton';
+import { CreateEventStepper } from '@/components/events/create';
 
 export default function NewEventPage() {
   return (
@@ -16,19 +15,7 @@ export default function NewEventPage() {
         <h1 className="text-3xl font-bold tracking-tight">Nuevo evento</h1>
       </div>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>Configuracion del evento</CardTitle>
-          <CardDescription>
-            El formulario de creacion de eventos estara disponible pronto.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {Array.from({ length: 4 }).map((_, i) => (
-            <Skeleton key={i} className="h-10 w-full" />
-          ))}
-        </CardContent>
-      </Card>
+      <CreateEventStepper />
     </div>
   );
 }
