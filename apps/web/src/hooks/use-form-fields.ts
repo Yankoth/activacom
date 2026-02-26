@@ -3,8 +3,10 @@ import { toast } from 'sonner';
 import {
   getFormFields,
   createFormFields,
+  createFormField,
   updateFormField,
   deleteFormField,
+  reorderFormFields,
 } from '@/lib/api/form-fields';
 import { formFieldKeys, eventKeys } from '@/lib/query-keys';
 import type { FormFieldInsert, FormFieldUpdate } from '@activacom/shared/types';
@@ -72,6 +74,46 @@ export function useDeleteFormField() {
     },
     onError: (error: Error) => {
       toast.error('Error al eliminar campo', { description: error.message });
+    },
+  });
+}
+
+export function useCreateFormField() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      eventId,
+      field,
+    }: {
+      eventId: string;
+      field: Omit<FormFieldInsert, 'event_id' | 'id' | 'created_at'>;
+    }) => createFormField(eventId, field),
+    onSuccess: (_data, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: formFieldKeys.list(eventId) });
+      queryClient.invalidateQueries({ queryKey: eventKeys.detail(eventId) });
+      toast.success('Campo agregado');
+    },
+    onError: (error: Error) => {
+      toast.error('Error al agregar campo', { description: error.message });
+    },
+  });
+}
+
+export function useReorderFormFields() {
+  const queryClient = useQueryClient();
+  return useMutation({
+    mutationFn: ({
+      eventId,
+      fieldOrders,
+    }: {
+      eventId: string;
+      fieldOrders: { id: string; sort_order: number }[];
+    }) => reorderFormFields(eventId, fieldOrders),
+    onSuccess: (_data, { eventId }) => {
+      queryClient.invalidateQueries({ queryKey: formFieldKeys.list(eventId) });
+    },
+    onError: (error: Error) => {
+      toast.error('Error al reordenar campos', { description: error.message });
     },
   });
 }

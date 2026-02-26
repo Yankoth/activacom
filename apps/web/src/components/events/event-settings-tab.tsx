@@ -326,7 +326,7 @@ export function EventSettingsTab({ event }: EventSettingsTabProps) {
           <CardTitle>Campos del formulario</CardTitle>
         </CardHeader>
         <CardContent>
-          <FormBuilder eventId={event.id} disabled={!isEditable} />
+          <FormBuilder mode="persisted" eventId={event.id} disabled={!isEditable} />
         </CardContent>
       </Card>
     </div>

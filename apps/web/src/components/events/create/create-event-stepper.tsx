@@ -15,6 +15,7 @@ import { StepBasicInfo } from './step-basic-info';
 import { StepFormFields } from './step-form-fields';
 import { StepPrivacy } from './step-privacy';
 import { StepOptions } from './step-options';
+import { getDefaultFormFields } from '@/components/forms/default-fields';
 import type { CreateFormFieldInput } from '@activacom/shared/types';
 
 const STEPS = [
@@ -33,7 +34,7 @@ const STEP_FIELDS: Record<number, (keyof CreateEventFormData)[]> = {
 export function CreateEventStepper() {
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState(0);
-  const [formFields, setFormFields] = useState<CreateFormFieldInput[]>([]);
+  const [formFields, setFormFields] = useState<CreateFormFieldInput[]>(getDefaultFormFields);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const tenant = useAuthStore((s) => s.tenant);
@@ -117,7 +118,7 @@ export function CreateEventStepper() {
 
   return (
     <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)}>
+      <div>
         {/* Step indicators */}
         <div className="mb-6 flex items-center gap-2">
           {STEPS.map((step, i) => (
@@ -174,7 +175,7 @@ export function CreateEventStepper() {
               <ChevronRight className="ml-2 size-4" />
             </Button>
           ) : (
-            <Button type="submit" disabled={isSubmitting}>
+            <Button type="button" disabled={isSubmitting} onClick={form.handleSubmit(onSubmit)}>
               {isSubmitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />
@@ -186,7 +187,7 @@ export function CreateEventStepper() {
             </Button>
           )}
         </div>
-      </form>
+      </div>
     </FormProvider>
   );
 }

@@ -54,6 +54,15 @@ export function EventActions({ event, onSelectWinner }: EventActionsProps) {
       });
       return;
     }
+    const hasContactField = event.form_fields.some(
+      (f) => f.is_contact_field && (f.contact_type === 'email' || f.contact_type === 'phone')
+    );
+    if (!hasContactField) {
+      toast.error('No se puede activar', {
+        description: 'El formulario necesita al menos un campo de contacto (email o telefono).',
+      });
+      return;
+    }
     setConfirmAction('activate');
   }
 
