@@ -59,3 +59,19 @@ export const adminTenantKeys = {
   events: (id: string) => [...adminTenantKeys.all, 'events', id] as const,
   credits: (id: string) => [...adminTenantKeys.all, 'credits', id] as const,
 };
+
+export interface ContactFilters {
+  search?: string;
+  marketingOptIn?: boolean;
+  verified?: 'email' | 'phone';
+  eventId?: string;
+}
+
+export const contactKeys = {
+  all: ['contacts'] as const,
+  lists: () => [...contactKeys.all, 'list'] as const,
+  list: (filters?: ContactFilters, page?: number) =>
+    [...contactKeys.lists(), filters, page] as const,
+  details: () => [...contactKeys.all, 'detail'] as const,
+  detail: (id: string) => [...contactKeys.details(), id] as const,
+};

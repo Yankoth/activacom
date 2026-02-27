@@ -31,7 +31,10 @@ export function EventParticipantsTab({ eventId, eventName }: EventParticipantsTa
       apellido: r.contact.last_name ?? '',
       email: r.contact.email ?? '',
       telefono: r.contact.phone ?? '',
+      email_verificado: r.contact.email_verified ? 'Si' : 'No',
+      telefono_verificado: r.contact.phone_verified ? 'Si' : 'No',
       marketing_opt_in: r.marketing_opt_in ? 'Si' : 'No',
+      nombre_evento: eventName,
       fecha_registro: format(new Date(r.created_at), 'yyyy-MM-dd HH:mm'),
       ...Object.fromEntries(
         Object.entries(r.form_data).map(([k, v]) => [`campo_${k}`, String(v ?? '')])

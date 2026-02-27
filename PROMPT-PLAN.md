@@ -16,7 +16,7 @@ Este documento contiene prompts numerados que ejecutarás en Claude Code en orde
 
 ## FASE 0 — Setup y Fundamentos (3-4 días)
 
-### 🔧 P0.1 — Crear proyecto Supabase (TÚ)
+### 🔧 P0.1 — Crear proyecto Supabase (TÚ) - Listo
 
 ```
 Acción manual:
@@ -31,7 +31,7 @@ Acción manual:
    - Site URL: http://localhost:5173 (por ahora, luego será https://app.activacom.mx)
 ```
 
-### 📦 P0.2 — Inicializar monorepo
+### 📦 P0.2 — Inicializar monorepo - Listo
 
 ```
 Lee el CLAUDE.md para entender la arquitectura completa del proyecto ActivaCom.
@@ -64,7 +64,7 @@ Cada app debe mostrar un "Hello World" diferente que identifique claramente qué
 NO instales shadcn/ui todavía. Solo el monorepo base funcional.
 ```
 
-### 📦 P0.3 — Instalar shadcn/ui y dependencias core
+### 📦 P0.3 — Instalar shadcn/ui y dependencias core - Listo
 
 ```
 Instalar dependencias diferenciadas por app. Recuerda: register, display y landing deben ser ultra-ligeras.
@@ -98,7 +98,7 @@ En packages/shared:
 1. Solo TypeScript puro, sin dependencias de React
 ```
 
-### 📦 P0.4 — Supabase client y tipos compartidos
+### 📦 P0.4 — Supabase client y tipos compartidos - Listo
 
 ```
 Crea la configuración de Supabase diferenciada por app y los tipos base del sistema:
@@ -132,7 +132,7 @@ Crea la configuración de Supabase diferenciada por app y los tipos base del sis
    - NO Auth
 ```
 
-### 📦 P0.5 — Schema SQL completo
+### 📦 P0.5 — Schema SQL completo - Listo
 
 ```
 Crea el archivo supabase/migrations/001_initial_schema.sql con el schema completo de la base de datos.
@@ -167,7 +167,7 @@ Al final del archivo agrega un bloque de seed data con:
 - 1 super_admin
 ```
 
-### 🔧 P0.6 — Ejecutar migration en Supabase (TÚ)
+### 🔧 P0.6 — Ejecutar migration en Supabase (TÚ) - Listo
 
 ```
 Acción manual:
@@ -184,7 +184,7 @@ Alternativa con CLI:
 4. supabase db push
 ```
 
-### 📦 P0.7 — Layout base y routing
+### 📦 P0.7 — Layout base y routing - Listo
 
 ```
 Crea el layout base de apps/web (panel admin) y el placeholder de apps/register.
@@ -251,7 +251,7 @@ Crea el layout base de apps/web (panel admin) y el placeholder de apps/register.
 Asegúrate de que TODAS las apps compilen sin errores y levanten correctamente.
 ```
 
-### ✅ Checkpoint Fase 0
+### ✅ Checkpoint Fase 0 - Listo
 
 ```
 Verifica:
@@ -272,7 +272,7 @@ Verifica:
 
 ## FASE 1 — Rifa Simple (1.5-2 semanas)
 
-### 📦 P1.1 — CRUD de Eventos
+### 📦 P1.1 — CRUD de Eventos - Listo
 
 ```
 Implementa el CRUD completo de eventos para el tenant:
@@ -315,7 +315,7 @@ Implementa el CRUD completo de eventos para el tenant:
 5. Usa React Query para todas las queries y mutations con invalidación de cache apropiada.
 ```
 
-### 📦 P1.2 — Form Builder dinámico
+### 📦 P1.2 — Form Builder dinámico - Ya
 
 ```
 Implementa el form builder que permite al tenant definir los campos del formulario de su evento.
@@ -356,7 +356,7 @@ Implementa el form builder que permite al tenant definir los campos del formular
    - NOTA: apps/register tendrá su PROPIO FormRenderer ligero (se construye en P1.4). No reutilizar este.
 ```
 
-### 📦 P1.3 — Edge Function: Registro de participante
+### 📦 P1.3 — Edge Function: Registro de participante - Ya
 
 ```
 Crea la Edge Function supabase/functions/register-participant/index.ts que maneja el registro público de participantes.
@@ -389,7 +389,7 @@ Manejo de errores:
 La función debe ser lo más rápida posible. Usa prepared statements donde sea posible.
 ```
 
-### 📦 P1.4 — Página pública de registro (apps/register)
+### 📦 P1.4 — Página pública de registro (apps/register) - Ya
 
 ```
 Implementa las páginas públicas en apps/register (go.activacom.mx) que los participantes ven al escanear el QR.
@@ -441,7 +441,7 @@ IMPORTANTE sobre rendimiento:
    - El bundle de apps/register debe ser <120KB total
 ```
 
-### 📦 P1.5 — Selección de ganador
+### 📦 P1.5 — Selección de ganador - Ya
 
 ```
 Implementa la funcionalidad de seleccionar ganador de una rifa.
@@ -464,7 +464,7 @@ Implementa la funcionalidad de seleccionar ganador de una rifa.
    - Permitir seleccionar otro ganador (reemplaza al anterior, o acumula — decides si permitir múltiples ganadores)
 ```
 
-### 📦 P1.6 — Dashboard del tenant
+### 📦 P1.6 — Dashboard del tenant - Ya
 
 ```
 Implementa el dashboard principal del tenant en /dashboard.
@@ -491,7 +491,7 @@ Implementa el dashboard principal del tenant en /dashboard.
 El dashboard debe cargar rápido. Usa React Query con staleTime apropiado. Las queries deben estar optimizadas (no traer todos los registros, usar COUNT y aggregates).
 ```
 
-### 📦 P1.7 — Panel Super Admin básico
+### 📦 P1.7 — Panel Super Admin básico - Ya
 
 ```
 Implementa el panel de super admin en /admin.
@@ -519,7 +519,7 @@ Implementa el panel de super admin en /admin.
 4. RPC o query directa para métricas cross-tenant (el super admin tiene RLS que permite cross-tenant).
 ```
 
-### 📦 P1.8 — Exportación CSV y lista de contactos
+### 📦 P1.8 — Exportación CSV y lista de contactos - Ya
 
 ```
 Implementa la gestión de contactos y la exportación de datos.
