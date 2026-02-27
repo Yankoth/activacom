@@ -1,54 +1,81 @@
-import { createClient } from '@supabase/supabase-js';
 import type {
-  Database,
   RegisterParticipantInput,
   RegisterParticipantResponse,
+  AlreadyRegisteredResponse,
   UploadPhotoResponse,
   EventPublicData,
+  CheckParticipantInput,
+  CheckParticipantResponse,
 } from '@activacom/shared/types';
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-const supabasePublishableKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
+const apiKey = import.meta.env.VITE_SUPABASE_PUBLISHABLE_KEY;
 
-if (!supabaseUrl || !supabasePublishableKey) {
+if (!supabaseUrl || !apiKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-const supabase = createClient<Database>(supabaseUrl, supabasePublishableKey, {
-  auth: { persistSession: false },
-});
+const headers: HeadersInit = {
+  'Content-Type': 'application/json',
+  apikey: apiKey,
+};
+
+async function invokeFunction<T>(name: string, body: unknown): Promise<T> {
+  const response = await fetch(`${supabaseUrl}/functions/v1/${name}`, {
+    method: 'POST',
+    headers,
+    body: JSON.stringify(body),
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error ?? `${name} failed`);
+  }
+
+  return response.json();
+}
 
 export async function fetchEventByCode(code: string): Promise<EventPublicData> {
-  const { data, error } = await supabase.functions.invoke<EventPublicData>(
-    'get-event-public',
-    { body: { code } },
-  );
-  if (error || !data) {
-    throw new Error(error?.message ?? 'Event not found');
-  }
-  return data;
+  return invokeFunction<EventPublicData>('get-event-public', { code });
 }
 
 export async function resolveSlugToEvent(slug: string): Promise<{ event_code: string } | null> {
-  const { data, error } = await supabase.functions.invoke<{ event_code: string }>(
-    'resolve-slug',
-    { body: { slug } },
-  );
-  if (error || !data) return null;
-  return data;
+  try {
+    return await invokeFunction<{ event_code: string }>('resolve-slug', { slug });
+  } catch {
+    return null;
+  }
+}
+
+export async function checkParticipant(
+  input: CheckParticipantInput,
+): Promise<CheckParticipantResponse> {
+  return invokeFunction<CheckParticipantResponse>('check-participant', input);
 }
 
 export async function registerParticipant(
   input: RegisterParticipantInput,
-): Promise<RegisterParticipantResponse> {
-  const { data, error } = await supabase.functions.invoke<RegisterParticipantResponse>(
-    'register-participant',
-    { body: input },
+): Promise<RegisterParticipantResponse | AlreadyRegisteredResponse> {
+  const response = await fetch(
+    `${supabaseUrl}/functions/v1/register-participant`,
+    {
+      method: 'POST',
+      headers,
+      body: JSON.stringify(input),
+    },
   );
-  if (error || !data) {
-    throw new Error(error?.message ?? 'Registration failed');
+
+  const data = await response.json();
+
+  if (response.status === 409) {
+    return data as AlreadyRegisteredResponse;
   }
-  return data;
+
+  if (!response.ok) {
+    throw new Error(data.error ?? 'Registration failed');
+  }
+
+  return data as RegisterParticipantResponse;
 }
 
 export async function uploadPhoto(
@@ -61,12 +88,16 @@ export async function uploadPhoto(
   formData.append('registration_id', registrationId);
   formData.append('event_id', eventId);
 
-  const { data, error } = await supabase.functions.invoke<UploadPhotoResponse>(
-    'upload-photo',
-    { body: formData },
-  );
-  if (error || !data) {
-    throw new Error(error?.message ?? 'Photo upload failed');
+  const response = await fetch(`${supabaseUrl}/functions/v1/upload-photo`, {
+    method: 'POST',
+    headers: { apikey: apiKey },
+    body: formData,
+  });
+
+  if (!response.ok) {
+    const data = await response.json().catch(() => ({}));
+    throw new Error(data.error ?? 'Photo upload failed');
   }
-  return data;
+
+  return response.json();
 }

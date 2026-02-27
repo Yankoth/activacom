@@ -659,9 +659,15 @@ export interface RegisterParticipantInput {
 }
 
 export interface RegisterParticipantResponse {
+  success: true;
   registration_id: string;
   contact_id: string;
-  already_registered: boolean;
+  is_returning: boolean;
+}
+
+export interface AlreadyRegisteredResponse {
+  already_registered: true;
+  contact_name: string | null;
 }
 
 export interface UploadPhotoResponse {
@@ -686,6 +692,10 @@ export interface EventPublicData {
   status: EventStatus;
   privacy_notice_url: string | null;
   photo_source: PhotoSource | null;
+  geofencing_enabled: boolean;
+  geofencing_lat: number | null;
+  geofencing_lng: number | null;
+  geofencing_radius: number | null;
   form_fields: Array<{
     id: string;
     label: string;
@@ -694,6 +704,19 @@ export interface EventPublicData {
     options: string[] | null;
     sort_order: number;
   }>;
+}
+
+export interface CheckParticipantInput {
+  event_code: string;
+  email?: string;
+  phone?: string;
+}
+
+export interface CheckParticipantResponse {
+  registered_in_event: boolean;
+  returning_contact: boolean;
+  contact_name: string | null;
+  prefill_data: Record<string, unknown> | null;
 }
 
 export interface SelectWinnerInput {
