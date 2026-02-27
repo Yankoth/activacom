@@ -30,3 +30,10 @@ export const winnerKeys = {
   lists: () => [...winnerKeys.all, 'list'] as const,
   list: (eventId: string) => [...winnerKeys.lists(), eventId] as const,
 };
+
+export const dashboardKeys = {
+  all: ['dashboard'] as const,
+  stats: () => [...dashboardKeys.all, 'stats'] as const,
+  chart: () => [...dashboardKeys.all, 'chart'] as const,
+  recent: () => [...dashboardKeys.all, 'recent'] as const,
+};
