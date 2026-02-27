@@ -23,6 +23,7 @@ const AdminIndexPage = lazy(() => import('./pages/admin'));
 const AdminTenantsPage = lazy(() => import('./pages/admin/tenants'));
 const AdminAdsPage = lazy(() => import('./pages/admin/ads'));
 const AdminCreditsPage = lazy(() => import('./pages/admin/credits'));
+const AdminTenantDetailPage = lazy(() => import('./pages/admin/tenant-detail'));
 
 function PageLoader() {
   return (
@@ -61,6 +62,7 @@ export function App() {
               <Route element={<RoleGuard allowedRoles={['super_admin']} />}>
                 <Route path="/admin" element={<AdminIndexPage />} />
                 <Route path="/admin/tenants" element={<AdminTenantsPage />} />
+                <Route path="/admin/tenants/:id" element={<AdminTenantDetailPage />} />
                 <Route path="/admin/ads" element={<AdminAdsPage />} />
                 <Route path="/admin/credits" element={<AdminCreditsPage />} />
               </Route>

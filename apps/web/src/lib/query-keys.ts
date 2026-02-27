@@ -1,4 +1,4 @@
-import type { EventStatus } from '@activacom/shared/types';
+import type { EventStatus, PlanType, TenantType } from '@activacom/shared/types';
 
 export interface EventFilters {
   status?: EventStatus;
@@ -36,4 +36,26 @@ export const dashboardKeys = {
   stats: () => [...dashboardKeys.all, 'stats'] as const,
   chart: () => [...dashboardKeys.all, 'chart'] as const,
   recent: () => [...dashboardKeys.all, 'recent'] as const,
+};
+
+export interface TenantFilters {
+  search?: string;
+  status?: 'active' | 'inactive';
+  plan?: PlanType;
+  type?: TenantType;
+}
+
+export const adminKeys = {
+  all: ['admin'] as const,
+  stats: () => [...adminKeys.all, 'stats'] as const,
+};
+
+export const adminTenantKeys = {
+  all: ['admin-tenants'] as const,
+  lists: () => [...adminTenantKeys.all, 'list'] as const,
+  list: (filters?: TenantFilters) => [...adminTenantKeys.lists(), filters] as const,
+  details: () => [...adminTenantKeys.all, 'detail'] as const,
+  detail: (id: string) => [...adminTenantKeys.details(), id] as const,
+  events: (id: string) => [...adminTenantKeys.all, 'events', id] as const,
+  credits: (id: string) => [...adminTenantKeys.all, 'credits', id] as const,
 };
