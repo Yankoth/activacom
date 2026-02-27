@@ -127,10 +127,18 @@ export function EventActions({ event, onSelectWinner }: EventActionsProps) {
           </>
         )}
         {event.status === 'active' && (
-          <Button variant="outline" onClick={() => setConfirmAction('close')} disabled={isPending}>
-            <Square className="mr-2 size-4" />
-            Cerrar
-          </Button>
+          <>
+            {onSelectWinner && (
+              <Button variant="outline" onClick={onSelectWinner} disabled={isPending}>
+                <Trophy className="mr-2 size-4" />
+                Seleccionar ganador
+              </Button>
+            )}
+            <Button variant="outline" onClick={() => setConfirmAction('close')} disabled={isPending}>
+              <Square className="mr-2 size-4" />
+              Cerrar
+            </Button>
+          </>
         )}
         {event.status === 'closed' && (
           <>

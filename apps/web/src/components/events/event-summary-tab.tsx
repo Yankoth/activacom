@@ -1,13 +1,13 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, Check, Users, Eye, Link2, Calendar } from 'lucide-react';
+import { Copy, Check, Users, Eye, Link2, Calendar, Trophy } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Separator } from '@/components/ui/separator';
 import type { EventWithFormFields } from '@/lib/api/events';
-import { useEventWinner } from '@/hooks/use-winners';
+import { useEventWinners } from '@/hooks/use-winners';
 
 const REGISTER_URL = import.meta.env.VITE_REGISTER_URL || 'https://go.activacom.mx';
 
@@ -17,7 +17,7 @@ interface EventSummaryTabProps {
 
 export function EventSummaryTab({ event }: EventSummaryTabProps) {
   const [copied, setCopied] = useState(false);
-  const { data: winner } = useEventWinner(event.id);
+  const { data: winners } = useEventWinners(event.id);
 
   const registrationUrl =
     event.qr_mode === 'fixed'
@@ -29,6 +29,11 @@ export function EventSummaryTab({ event }: EventSummaryTabProps) {
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
   }
+
+  const showWinnersCard =
+    (winners && winners.length > 0) ||
+    event.status === 'active' ||
+    event.status === 'closed';
 
   return (
     <div className="grid gap-4 md:grid-cols-2">
@@ -82,6 +87,63 @@ export function EventSummaryTab({ event }: EventSummaryTabProps) {
           </div>
         </CardContent>
       </Card>
+
+      {/* Winners */}
+      {showWinnersCard && (
+        <Card className="md:col-span-2">
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Trophy className="size-4" />
+              Ganadores
+              {winners && winners.length > 0 && (
+                <Badge variant="secondary">{winners.length}</Badge>
+              )}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            {!winners || winners.length === 0 ? (
+              <p className="text-muted-foreground text-sm">
+                No se ha seleccionado ningun ganador.
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {winners.map((winner, index) => {
+                  const isLatest = index === winners.length - 1;
+                  return (
+                    <div
+                      key={winner.id}
+                      className={`flex items-center gap-3 rounded-lg px-3 py-2 ${
+                        isLatest ? 'bg-primary/5' : ''
+                      }`}
+                    >
+                      <span className="text-muted-foreground w-8 text-sm font-semibold">
+                        #{index + 1}
+                      </span>
+                      <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-medium">
+                          {[winner.contact.first_name, winner.contact.last_name]
+                            .filter(Boolean)
+                            .join(' ') || 'Sin nombre'}
+                        </p>
+                        <p className="text-muted-foreground truncate text-xs">
+                          {[winner.contact.email, winner.contact.phone]
+                            .filter(Boolean)
+                            .join(' · ')}
+                        </p>
+                      </div>
+                      <span className="text-muted-foreground shrink-0 text-xs">
+                        {format(new Date(winner.selected_at), "d MMM yyyy HH:mm", {
+                          locale: es,
+                        })}
+                      </span>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       {/* Event details */}
       <Card className="md:col-span-2">
@@ -137,19 +199,6 @@ export function EventSummaryTab({ event }: EventSummaryTabProps) {
               )}
             </div>
           </div>
-
-          {winner && (
-            <>
-              <Separator />
-              <div>
-                <h4 className="mb-1 font-semibold">Ganador</h4>
-                <p className="text-sm">
-                  {winner.contact.first_name} {winner.contact.last_name}
-                  {winner.contact.email && ` — ${winner.contact.email}`}
-                </p>
-              </div>
-            </>
-          )}
         </CardContent>
       </Card>
     </div>

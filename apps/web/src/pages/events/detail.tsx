@@ -38,7 +38,9 @@ export default function EventDetailPage() {
       <EventHeader
         event={event}
         onSelectWinner={
-          event.status === 'closed' ? () => setWinnerDialogOpen(true) : undefined
+          event.status === 'active' || event.status === 'closed'
+            ? () => setWinnerDialogOpen(true)
+            : undefined
         }
       />
 

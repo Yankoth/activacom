@@ -721,7 +721,26 @@ export interface CheckParticipantResponse {
 
 export interface SelectWinnerInput {
   event_id: string;
-  registration_id?: string;
+  method: 'random' | 'manual';
+  registration_id?: string; // required only when method === 'manual'
+}
+
+export interface SelectWinnerResponse {
+  winner: {
+    id: string;
+    event_id: string;
+    registration_id: string;
+    contact_id: string;
+    selected_by: string;
+    selected_at: string;
+    contact: {
+      first_name: string | null;
+      last_name: string | null;
+      email: string | null;
+      phone: string | null;
+    };
+  };
+  winner_number: number;
 }
 
 export interface DisplayEventState {

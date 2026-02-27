@@ -27,5 +27,6 @@ export const registrationKeys = {
 
 export const winnerKeys = {
   all: ['winners'] as const,
-  detail: (eventId: string) => [...winnerKeys.all, eventId] as const,
+  lists: () => [...winnerKeys.all, 'list'] as const,
+  list: (eventId: string) => [...winnerKeys.lists(), eventId] as const,
 };
