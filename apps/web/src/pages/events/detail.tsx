@@ -69,7 +69,7 @@ export default function EventDetailPage() {
         )}
         {isPhotoDrop && (
           <TabsContent value="display" className="mt-4">
-            <EventDisplayControlTab eventId={event.id} />
+            <EventDisplayControlTab eventId={event.id} eventCode={event.code} />
           </TabsContent>
         )}
         <TabsContent value="settings" className="mt-4">

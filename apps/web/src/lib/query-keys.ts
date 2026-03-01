@@ -73,6 +73,12 @@ export const photoKeys = {
   pending: (eventId: string) => [...photoKeys.all, 'pending', eventId] as const,
 };
 
+export const displaySessionKeys = {
+  all: ['display-sessions'] as const,
+  lists: () => [...displaySessionKeys.all, 'list'] as const,
+  list: (eventId: string) => [...displaySessionKeys.lists(), eventId] as const,
+};
+
 export const contactKeys = {
   all: ['contacts'] as const,
   lists: () => [...contactKeys.all, 'list'] as const,
