@@ -70,6 +70,7 @@ export interface ContactFilters {
 export const photoKeys = {
   all: ['photos'] as const,
   counts: (eventId: string) => [...photoKeys.all, 'counts', eventId] as const,
+  pending: (eventId: string) => [...photoKeys.all, 'pending', eventId] as const,
 };
 
 export const contactKeys = {
