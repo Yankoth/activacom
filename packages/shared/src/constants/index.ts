@@ -48,5 +48,7 @@ export const MAX_DISPLAY_SESSIONS = 3;
 export const DEFAULT_DISPLAY_PHOTO_DURATION = 5; // seconds
 export const PHOTO_MAX_WIDTH = 1920;
 export const PHOTO_COMPRESSION_QUALITY = 0.8;
+export const PHOTO_THUMBNAIL_WIDTH = 400;
+export const PHOTO_THUMBNAIL_QUALITY = 0.7;
 export const RATE_LIMIT_ATTEMPTS_PER_MINUTE = 10;
 export const DEVICE_CODE_LENGTH = 6;

@@ -2,9 +2,8 @@ import { useMemo, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { z } from 'zod';
-import { Camera } from 'lucide-react';
 import type { EventPublicData, EventType, PhotoSource } from '@activacom/shared/types';
-import { MAX_PHOTO_SIZE } from '@activacom/shared/constants';
+import { PhotoCapture } from './PhotoCapture';
 
 type FormField = EventPublicData['form_fields'][number];
 
@@ -13,6 +12,7 @@ interface FormRendererProps {
   privacyNoticeUrl: string | null;
   eventType: EventType;
   photoSource: PhotoSource | null;
+  requirePhoto: boolean;
   prefillData?: Record<string, unknown> | null;
   onSubmit: (data: {
     form_data: Record<string, unknown>;
@@ -75,16 +75,12 @@ function getInputMode(fieldType: string): React.HTMLAttributes<HTMLInputElement>
   }
 }
 
-function getCaptureAttr(photoSource: PhotoSource | null): 'environment' | 'user' | undefined {
-  if (photoSource === 'camera') return 'environment';
-  return undefined;
-}
-
 export function FormRenderer({
   fields,
   privacyNoticeUrl,
   eventType,
   photoSource,
+  requirePhoto,
   prefillData,
   onSubmit,
   isSubmitting,
@@ -116,13 +112,14 @@ export function FormRenderer({
     defaultValues,
   });
 
-  const needsPhoto = eventType === 'photo_drop' && photoSource !== null;
+  const showPhotoCapture = eventType === 'photo_drop' && photoSource !== null;
+  const photoRequired = showPhotoCapture && requirePhoto;
 
   const handleFormSubmit = handleSubmit(async (data) => {
     // Honeypot check — silently "succeed" without actually registering
     if (honeypot) return;
 
-    if (needsPhoto && !photoFile) {
+    if (photoRequired && !photoFile) {
       setPhotoError('Debes agregar una foto');
       return;
     }
@@ -139,28 +136,6 @@ export function FormRenderer({
       photo: photoFile ?? undefined,
     });
   });
-
-  const handlePhotoChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    setPhotoError(null);
-
-    if (!file) {
-      setPhotoFile(null);
-      return;
-    }
-
-    if (!file.type.startsWith('image/')) {
-      setPhotoError('El archivo debe ser una imagen');
-      return;
-    }
-
-    if (file.size > MAX_PHOTO_SIZE) {
-      setPhotoError('La imagen no debe superar 5MB');
-      return;
-    }
-
-    setPhotoFile(file);
-  };
 
   const inputClasses =
     'w-full rounded-xl border border-gray-300 bg-white px-4 py-3 text-base text-gray-900 placeholder:text-gray-400 focus:border-blue-500 focus:outline-none focus:ring-2 focus:ring-blue-500/20 disabled:opacity-50';
@@ -248,29 +223,16 @@ export function FormRenderer({
       ))}
 
       {/* Photo capture for photo_drop */}
-      {needsPhoto && (
-        <div>
-          <label className="mb-1.5 block text-sm font-medium text-gray-700">
-            Foto <span className="ml-0.5 text-red-500">*</span>
-          </label>
-          <label className="flex cursor-pointer flex-col items-center gap-2 rounded-xl border-2 border-dashed border-gray-300 bg-gray-50 px-4 py-6 transition-colors hover:border-blue-400 hover:bg-blue-50/50">
-            <Camera className="h-8 w-8 text-gray-400" />
-            <span className="text-sm text-gray-500">
-              {photoFile ? photoFile.name : 'Toca para agregar una foto'}
-            </span>
-            <input
-              type="file"
-              accept="image/*"
-              capture={getCaptureAttr(photoSource)}
-              className="hidden"
-              onChange={handlePhotoChange}
-              disabled={isSubmitting}
-            />
-          </label>
-          {photoError && (
-            <p className="mt-1 text-xs text-red-500">{photoError}</p>
-          )}
-        </div>
+      {showPhotoCapture && (
+        <PhotoCapture
+          photoSource={photoSource!}
+          required={photoRequired}
+          disabled={isSubmitting}
+          error={photoError}
+          file={photoFile}
+          onPhotoChange={setPhotoFile}
+          onError={setPhotoError}
+        />
       )}
 
       {/* Privacy & marketing checkboxes */}

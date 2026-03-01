@@ -82,9 +82,11 @@ export async function uploadPhoto(
   registrationId: string,
   eventId: string,
   file: File,
+  thumbnail: File,
 ): Promise<UploadPhotoResponse> {
   const formData = new FormData();
   formData.append('file', file);
+  formData.append('thumbnail', thumbnail);
   formData.append('registration_id', registrationId);
   formData.append('event_id', eventId);
 

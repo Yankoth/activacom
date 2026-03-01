@@ -8,7 +8,7 @@ import {
   uploadPhoto,
 } from '@/lib/supabase';
 import { isWithinRadius } from '@/lib/geo';
-import { compressImage } from '@/lib/image';
+import { compressImage, generateThumbnail } from '@/lib/image';
 import { getTurnstileToken } from '@/lib/turnstile';
 import { LoadingScreen } from '@/components/LoadingScreen';
 import { ErrorScreen } from '@/components/ErrorScreen';
@@ -175,10 +175,10 @@ export default function EventRegistration() {
         if (data.photo) {
           try {
             const compressed = await compressImage(data.photo);
-            await uploadPhoto(result.registration_id, state.event.id, compressed);
+            const thumbnail = await generateThumbnail(compressed);
+            await uploadPhoto(result.registration_id, state.event.id, compressed, thumbnail);
           } catch {
             // Photo upload failed — registration still succeeded
-            // In the future, we could show a warning
           }
         }
 
@@ -261,6 +261,7 @@ export default function EventRegistration() {
           privacyNoticeUrl={event.privacy_notice_url}
           eventType={event.type}
           photoSource={event.photo_source}
+          requirePhoto={event.require_photo}
           prefillData={state.phase === 'form' ? state.prefillData : null}
           onSubmit={handleSubmit}
           isSubmitting={isSubmitting}
