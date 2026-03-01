@@ -5,6 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import {
@@ -44,6 +45,7 @@ export function EventSettingsTab({ event }: EventSettingsTabProps) {
       type: event.type,
       qr_mode: event.qr_mode,
       photo_source: event.photo_source ?? undefined,
+      require_photo: event.require_photo ?? false,
       privacy_notice_url: event.privacy_notice_url ?? '',
       geofencing_enabled: event.geofencing_enabled,
       geofencing_lat: event.geofencing_lat ?? undefined,
@@ -55,6 +57,9 @@ export function EventSettingsTab({ event }: EventSettingsTabProps) {
       ends_at: event.ends_at ?? '',
     },
   });
+
+  const watchedType = form.watch('type');
+  const isPhotoDrop = watchedType === 'photo_drop';
 
   function onSubmit(data: UpdateEventFormData) {
     updateMutation.mutate({
@@ -68,6 +73,8 @@ export function EventSettingsTab({ event }: EventSettingsTabProps) {
         geofencing_lat: data.geofencing_enabled ? data.geofencing_lat : null,
         geofencing_lng: data.geofencing_enabled ? data.geofencing_lng : null,
         geofencing_radius: data.geofencing_enabled ? data.geofencing_radius : null,
+        require_photo: isPhotoDrop ? (data.require_photo ?? false) : false,
+        photo_source: isPhotoDrop ? data.photo_source : null,
       },
     });
   }
@@ -189,6 +196,75 @@ export function EventSettingsTab({ event }: EventSettingsTabProps) {
 
               <Separator />
 
+              {isPhotoDrop && (
+                <>
+                  <FormField
+                    control={form.control}
+                    name="photo_source"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Fuente de fotos</FormLabel>
+                        <Select
+                          onValueChange={field.onChange}
+                          defaultValue={field.value}
+                          disabled={!isEditable}
+                        >
+                          <FormControl>
+                            <SelectTrigger className="w-full">
+                              <SelectValue placeholder="Seleccionar fuente" />
+                            </SelectTrigger>
+                          </FormControl>
+                          <SelectContent>
+                            <SelectItem value="camera">Camara</SelectItem>
+                            <SelectItem value="gallery">Galeria</SelectItem>
+                            <SelectItem value="both">Ambas</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="require_photo"
+                    render={({ field }) => (
+                      <FormItem className="flex items-center justify-between rounded-lg border p-4">
+                        <div className="space-y-0.5">
+                          <FormLabel className="text-base">Requerir foto</FormLabel>
+                          <FormDescription>
+                            Requerir foto para completar el registro
+                          </FormDescription>
+                        </div>
+                        <FormControl>
+                          <Switch
+                            checked={field.value}
+                            onCheckedChange={field.onChange}
+                            disabled={!isEditable}
+                          />
+                        </FormControl>
+                      </FormItem>
+                    )}
+                  />
+
+                  <FormField
+                    control={form.control}
+                    name="display_photo_duration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Duracion de foto en display (seg)</FormLabel>
+                        <FormControl>
+                          <Input type="number" min={3} max={30} {...field} disabled={!isEditable} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+
+                  <Separator />
+                </>
+              )}
+
               <FormField
                 control={form.control}
                 name="geofencing_enabled"
@@ -253,19 +329,21 @@ export function EventSettingsTab({ event }: EventSettingsTabProps) {
               <Separator />
 
               <div className="grid grid-cols-2 gap-4">
-                <FormField
-                  control={form.control}
-                  name="display_photo_duration"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Duracion de foto en display (seg)</FormLabel>
-                      <FormControl>
-                        <Input type="number" min={3} max={30} {...field} disabled={!isEditable} />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
+                {!isPhotoDrop && (
+                  <FormField
+                    control={form.control}
+                    name="display_photo_duration"
+                    render={({ field }) => (
+                      <FormItem>
+                        <FormLabel>Duracion de foto en display (seg)</FormLabel>
+                        <FormControl>
+                          <Input type="number" min={3} max={30} {...field} disabled={!isEditable} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                )}
                 <FormField
                   control={form.control}
                   name="max_display_sessions"

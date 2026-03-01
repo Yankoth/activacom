@@ -7,4 +7,6 @@ export { EventHeader } from './event-header';
 export { EventSummaryTab } from './event-summary-tab';
 export { EventParticipantsTab } from './event-participants-tab';
 export { EventSettingsTab } from './event-settings-tab';
+export { EventModerationTab } from './event-moderation-tab';
+export { EventDisplayControlTab } from './event-display-control-tab';
 export { WinnerDialog } from './winner-dialog';

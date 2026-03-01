@@ -7,6 +7,8 @@ import {
   EventSummaryTab,
   EventParticipantsTab,
   EventSettingsTab,
+  EventModerationTab,
+  EventDisplayControlTab,
   WinnerDialog,
 } from '@/components/events';
 import { useEvent } from '@/hooks/use-events';
@@ -33,6 +35,8 @@ export default function EventDetailPage() {
     );
   }
 
+  const isPhotoDrop = event.type === 'photo_drop';
+
   return (
     <div className="space-y-6">
       <EventHeader
@@ -48,6 +52,8 @@ export default function EventDetailPage() {
         <TabsList>
           <TabsTrigger value="summary">Resumen</TabsTrigger>
           <TabsTrigger value="participants">Participantes</TabsTrigger>
+          {isPhotoDrop && <TabsTrigger value="moderation">Moderacion</TabsTrigger>}
+          {isPhotoDrop && <TabsTrigger value="display">Pantalla</TabsTrigger>}
           <TabsTrigger value="settings">Configuracion</TabsTrigger>
         </TabsList>
         <TabsContent value="summary" className="mt-4">
@@ -56,6 +62,16 @@ export default function EventDetailPage() {
         <TabsContent value="participants" className="mt-4">
           <EventParticipantsTab eventId={event.id} eventName={event.name} />
         </TabsContent>
+        {isPhotoDrop && (
+          <TabsContent value="moderation" className="mt-4">
+            <EventModerationTab eventId={event.id} />
+          </TabsContent>
+        )}
+        {isPhotoDrop && (
+          <TabsContent value="display" className="mt-4">
+            <EventDisplayControlTab eventId={event.id} />
+          </TabsContent>
+        )}
         <TabsContent value="settings" className="mt-4">
           <EventSettingsTab event={event} />
         </TabsContent>

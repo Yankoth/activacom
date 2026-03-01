@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useForm, FormProvider } from 'react-hook-form';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -14,22 +14,54 @@ import { useAuthStore } from '@/stores/auth-store';
 import { StepBasicInfo } from './step-basic-info';
 import { StepFormFields } from './step-form-fields';
 import { StepPrivacy } from './step-privacy';
+import { StepPhotoConfig } from './step-photo-config';
 import { StepOptions } from './step-options';
 import { getDefaultFormFields } from '@/components/forms/default-fields';
 import type { CreateFormFieldInput } from '@activacom/shared/types';
 
-const STEPS = [
+interface StepDef {
+  title: string;
+  description: string;
+}
+
+const BASE_STEPS: StepDef[] = [
   { title: 'Informacion basica', description: 'Nombre, tipo y modo QR del evento' },
   { title: 'Formulario', description: 'Campos que llenaran los participantes' },
   { title: 'Privacidad', description: 'Aviso de privacidad (LFPDPPP)' },
-  { title: 'Opciones', description: 'Geofencing, display y fechas' },
-] as const;
+];
 
-const STEP_FIELDS: Record<number, (keyof CreateEventFormData)[]> = {
-  0: ['name', 'type', 'qr_mode'],
-  2: ['privacy_notice_url'],
-  3: [],
+const PHOTO_STEP: StepDef = {
+  title: 'Fotos',
+  description: 'Configuracion de fotos para PhotoDrop',
 };
+
+const OPTIONS_STEP: StepDef = {
+  title: 'Opciones',
+  description: 'Geofencing, display y fechas',
+};
+
+function getSteps(eventType: string): StepDef[] {
+  if (eventType === 'photo_drop') {
+    return [...BASE_STEPS, PHOTO_STEP, OPTIONS_STEP];
+  }
+  return [...BASE_STEPS, OPTIONS_STEP];
+}
+
+function getStepFields(eventType: string): Record<number, (keyof CreateEventFormData)[]> {
+  if (eventType === 'photo_drop') {
+    return {
+      0: ['name', 'type', 'qr_mode'],
+      2: ['privacy_notice_url'],
+      3: [],
+      4: [],
+    };
+  }
+  return {
+    0: ['name', 'type', 'qr_mode'],
+    2: ['privacy_notice_url'],
+    3: [],
+  };
+}
 
 export function CreateEventStepper() {
   const navigate = useNavigate();
@@ -49,22 +81,54 @@ export function CreateEventStepper() {
       type: 'raffle',
       qr_mode: 'rotating',
       privacy_notice_url: '',
-      geofencing_enabled: false,
+      photo_source: 'both',
+      require_photo: false,
       display_photo_duration: 5,
+      geofencing_enabled: false,
       max_display_sessions: 3,
       starts_at: '',
       ends_at: '',
     },
   });
 
+  const eventType = form.watch('type');
+
+  const steps = useMemo(() => getSteps(eventType), [eventType]);
+  const stepFields = useMemo(() => getStepFields(eventType), [eventType]);
+
+  // Clamp currentStep when event type changes and reduces step count
+  useEffect(() => {
+    if (currentStep >= steps.length) {
+      setCurrentStep(steps.length - 1);
+    }
+  }, [steps.length, currentStep]);
+
+  // Determine which component to render for each step index
+  function getStepComponent(stepIndex: number) {
+    const stepTitle = steps[stepIndex]?.title;
+    switch (stepTitle) {
+      case 'Informacion basica':
+        return <StepBasicInfo />;
+      case 'Formulario':
+        return <StepFormFields fields={formFields} onChange={setFormFields} />;
+      case 'Privacidad':
+        return <StepPrivacy />;
+      case 'Fotos':
+        return <StepPhotoConfig />;
+      case 'Opciones':
+        return <StepOptions />;
+      default:
+        return null;
+    }
+  }
+
   async function goNext() {
-    // Validate current step fields
-    const fieldsToValidate = STEP_FIELDS[currentStep];
+    const fieldsToValidate = stepFields[currentStep];
     if (fieldsToValidate && fieldsToValidate.length > 0) {
       const valid = await form.trigger(fieldsToValidate);
       if (!valid) return;
     }
-    setCurrentStep((s) => Math.min(s + 1, STEPS.length - 1));
+    setCurrentStep((s) => Math.min(s + 1, steps.length - 1));
   }
 
   function goBack() {
@@ -80,6 +144,7 @@ export function CreateEventStepper() {
     setIsSubmitting(true);
     try {
       const code = generateEventCode();
+      const isPhotoDrop = data.type === 'photo_drop';
       const event = await createEvent.mutateAsync({
         tenant_id: tenant.id,
         name: data.name,
@@ -87,7 +152,8 @@ export function CreateEventStepper() {
         type: data.type,
         code,
         qr_mode: data.qr_mode,
-        photo_source: data.type === 'photo_drop' ? (data.photo_source ?? 'both') : null,
+        photo_source: isPhotoDrop ? (data.photo_source ?? 'both') : null,
+        require_photo: isPhotoDrop ? (data.require_photo ?? false) : false,
         geofencing_enabled: data.geofencing_enabled ?? false,
         geofencing_lat: data.geofencing_enabled ? (data.geofencing_lat ?? null) : null,
         geofencing_lng: data.geofencing_enabled ? (data.geofencing_lng ?? null) : null,
@@ -121,8 +187,8 @@ export function CreateEventStepper() {
       <div>
         {/* Step indicators */}
         <div className="mb-6 flex items-center gap-2">
-          {STEPS.map((step, i) => (
-            <div key={i} className="flex items-center gap-2">
+          {steps.map((step, i) => (
+            <div key={step.title} className="flex items-center gap-2">
               <div
                 className={`flex size-8 items-center justify-center rounded-full text-sm font-medium ${
                   i === currentStep
@@ -134,7 +200,7 @@ export function CreateEventStepper() {
               >
                 {i + 1}
               </div>
-              {i < STEPS.length - 1 && (
+              {i < steps.length - 1 && (
                 <div
                   className={`h-0.5 w-8 ${i < currentStep ? 'bg-primary' : 'bg-muted'}`}
                 />
@@ -145,16 +211,11 @@ export function CreateEventStepper() {
 
         <Card>
           <CardHeader>
-            <CardTitle>{STEPS[currentStep].title}</CardTitle>
-            <CardDescription>{STEPS[currentStep].description}</CardDescription>
+            <CardTitle>{steps[currentStep].title}</CardTitle>
+            <CardDescription>{steps[currentStep].description}</CardDescription>
           </CardHeader>
           <CardContent>
-            {currentStep === 0 && <StepBasicInfo />}
-            {currentStep === 1 && (
-              <StepFormFields fields={formFields} onChange={setFormFields} />
-            )}
-            {currentStep === 2 && <StepPrivacy />}
-            {currentStep === 3 && <StepOptions />}
+            {getStepComponent(currentStep)}
           </CardContent>
         </Card>
 
@@ -169,7 +230,7 @@ export function CreateEventStepper() {
             Anterior
           </Button>
 
-          {currentStep < STEPS.length - 1 ? (
+          {currentStep < steps.length - 1 ? (
             <Button type="button" onClick={goNext}>
               Siguiente
               <ChevronRight className="ml-2 size-4" />

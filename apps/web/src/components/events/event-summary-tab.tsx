@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { QRCodeSVG } from 'qrcode.react';
-import { Copy, Check, Users, Eye, Link2, Calendar, Trophy } from 'lucide-react';
+import { Copy, Check, Users, Eye, Link2, Calendar, Trophy, Camera, CheckCircle, XCircle, Clock } from 'lucide-react';
 import { format } from 'date-fns';
 import { es } from 'date-fns/locale';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -8,8 +8,15 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import type { EventWithFormFields } from '@/lib/api/events';
 import { useEventWinners } from '@/hooks/use-winners';
+import { useEventPhotoCounts } from '@/hooks/use-photos';
 
 const REGISTER_URL = import.meta.env.VITE_REGISTER_URL || 'https://go.activacom.mx';
+
+const PHOTO_SOURCE_LABELS: Record<string, string> = {
+  camera: 'Camara',
+  gallery: 'Galeria',
+  both: 'Ambas',
+};
 
 interface EventSummaryTabProps {
   event: EventWithFormFields;
@@ -18,6 +25,8 @@ interface EventSummaryTabProps {
 export function EventSummaryTab({ event }: EventSummaryTabProps) {
   const [copied, setCopied] = useState(false);
   const { data: winners } = useEventWinners(event.id);
+  const isPhotoDrop = event.type === 'photo_drop';
+  const { data: photoCounts } = useEventPhotoCounts(event.id, isPhotoDrop);
 
   const registrationUrl =
     event.qr_mode === 'fixed'
@@ -57,6 +66,51 @@ export function EventSummaryTab({ event }: EventSummaryTabProps) {
           <div className="text-2xl font-bold">{event.form_fields.length}</div>
         </CardContent>
       </Card>
+
+      {/* Photo stats (photo_drop only) */}
+      {isPhotoDrop && (
+        <>
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Fotos recibidas</CardTitle>
+              <Camera className="text-muted-foreground size-4" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">{photoCounts?.total ?? 0}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Aprobadas</CardTitle>
+              <CheckCircle className="size-4 text-green-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-green-600">{photoCounts?.approved ?? 0}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">Rechazadas</CardTitle>
+              <XCircle className="size-4 text-red-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-red-600">{photoCounts?.rejected ?? 0}</div>
+            </CardContent>
+          </Card>
+
+          <Card>
+            <CardHeader className="flex flex-row items-center justify-between pb-2">
+              <CardTitle className="text-sm font-medium">En cola</CardTitle>
+              <Clock className="size-4 text-yellow-500" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold text-yellow-600">{photoCounts?.pending ?? 0}</div>
+            </CardContent>
+          </Card>
+        </>
+      )}
 
       {/* QR + Link */}
       <Card className="md:col-span-2">
@@ -171,6 +225,22 @@ export function EventSummaryTab({ event }: EventSummaryTabProps) {
               <span className="text-muted-foreground">Geofencing:</span>{' '}
               {event.geofencing_enabled ? 'Activo' : 'Inactivo'}
             </div>
+            {isPhotoDrop && (
+              <>
+                <div>
+                  <span className="text-muted-foreground">Fuente de fotos:</span>{' '}
+                  {event.photo_source ? PHOTO_SOURCE_LABELS[event.photo_source] : 'No configurada'}
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Foto requerida:</span>{' '}
+                  {event.require_photo ? 'Si' : 'No'}
+                </div>
+                <div>
+                  <span className="text-muted-foreground">Duracion en display:</span>{' '}
+                  {event.display_photo_duration}s
+                </div>
+              </>
+            )}
             {event.starts_at && (
               <div>
                 <span className="text-muted-foreground">Inicio:</span>{' '}

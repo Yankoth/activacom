@@ -67,6 +67,11 @@ export interface ContactFilters {
   eventId?: string;
 }
 
+export const photoKeys = {
+  all: ['photos'] as const,
+  counts: (eventId: string) => [...photoKeys.all, 'counts', eventId] as const,
+};
+
 export const contactKeys = {
   all: ['contacts'] as const,
   lists: () => [...contactKeys.all, 'list'] as const,

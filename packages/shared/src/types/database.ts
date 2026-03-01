@@ -90,6 +90,7 @@ export interface Database {
           code: string;
           qr_mode: QRMode;
           photo_source: PhotoSource | null;
+          require_photo: boolean;
           geofencing_enabled: boolean;
           geofencing_lat: number | null;
           geofencing_lng: number | null;
@@ -112,6 +113,7 @@ export interface Database {
           code: string;
           qr_mode: QRMode;
           photo_source?: PhotoSource | null;
+          require_photo?: boolean;
           geofencing_enabled?: boolean;
           geofencing_lat?: number | null;
           geofencing_lng?: number | null;
@@ -133,6 +135,7 @@ export interface Database {
           code?: string;
           qr_mode?: QRMode;
           photo_source?: PhotoSource | null;
+          require_photo?: boolean;
           geofencing_enabled?: boolean;
           geofencing_lat?: number | null;
           geofencing_lng?: number | null;
@@ -692,6 +695,7 @@ export interface EventPublicData {
   status: EventStatus;
   privacy_notice_url: string | null;
   photo_source: PhotoSource | null;
+  require_photo: boolean;
   geofencing_enabled: boolean;
   geofencing_lat: number | null;
   geofencing_lng: number | null;
@@ -757,6 +761,7 @@ export interface CreateEventInput {
   type: EventType;
   qr_mode: QRMode;
   photo_source?: PhotoSource;
+  require_photo?: boolean;
   geofencing_enabled?: boolean;
   geofencing_lat?: number;
   geofencing_lng?: number;

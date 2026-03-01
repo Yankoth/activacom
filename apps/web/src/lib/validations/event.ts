@@ -14,13 +14,17 @@ export const stepPrivacySchema = z.object({
     .url('Debe ser una URL valida'),
 });
 
-export const stepOptionsSchema = z.object({
+export const stepPhotoConfigSchema = z.object({
   photo_source: z.enum(['camera', 'gallery', 'both']).optional(),
+  require_photo: z.boolean().optional(),
+  display_photo_duration: z.coerce.number().min(3).max(30).optional(),
+});
+
+export const stepOptionsSchema = z.object({
   geofencing_enabled: z.boolean().optional(),
   geofencing_lat: z.coerce.number().min(-90).max(90).optional(),
   geofencing_lng: z.coerce.number().min(-180).max(180).optional(),
   geofencing_radius: z.coerce.number().min(50).max(50000).optional(),
-  display_photo_duration: z.coerce.number().min(3).max(30).optional(),
   max_display_sessions: z.coerce.number().min(1).max(10).optional(),
   starts_at: z.string().optional().or(z.literal('')),
   ends_at: z.string().optional().or(z.literal('')),
@@ -28,6 +32,7 @@ export const stepOptionsSchema = z.object({
 
 export const createEventSchema = stepBasicInfoSchema
   .merge(stepPrivacySchema)
+  .merge(stepPhotoConfigSchema)
   .merge(stepOptionsSchema);
 
 export type CreateEventFormData = z.infer<typeof createEventSchema>;
