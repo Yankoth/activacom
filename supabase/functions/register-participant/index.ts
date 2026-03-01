@@ -37,9 +37,6 @@ Deno.serve(async (req) => {
     if (!event_code || typeof event_code !== 'string') {
       return jsonResponse({ error: 'event_code is required' }, 400);
     }
-    if (!turnstile_token || typeof turnstile_token !== 'string') {
-      return jsonResponse({ error: 'turnstile_token is required' }, 400);
-    }
     if (privacy_accepted !== true) {
       return jsonResponse(
         { error: 'Privacy notice must be accepted' },
@@ -53,6 +50,10 @@ Deno.serve(async (req) => {
     // 3. Verify Turnstile CAPTCHA
     const turnstileSecret = Deno.env.get('TURNSTILE_SECRET_KEY');
     if (turnstileSecret) {
+      if (!turnstile_token || typeof turnstile_token !== 'string') {
+        return jsonResponse({ error: 'turnstile_token is required' }, 400);
+      }
+
       const ip =
         req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ??
         req.headers.get('x-real-ip') ??

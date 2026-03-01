@@ -15,24 +15,28 @@ if (!supabaseUrl || !apiKey) {
   throw new Error('Missing Supabase environment variables');
 }
 
-const headers: HeadersInit = {
+// ── Raw fetch helpers ────────────────────────────────────────────────────────
+// sb_publishable_* keys are NOT JWTs — they must only be sent as `apikey`,
+// never in the `Authorization: Bearer` header (which causes 401).
+
+const baseHeaders: HeadersInit = {
   'Content-Type': 'application/json',
   apikey: apiKey,
 };
 
-async function invokeFunction<T>(name: string, body: unknown): Promise<T> {
+async function invokeFunction<T>(name: string, body: object): Promise<T> {
   const response = await fetch(`${supabaseUrl}/functions/v1/${name}`, {
     method: 'POST',
-    headers,
+    headers: baseHeaders,
     body: JSON.stringify(body),
   });
 
   if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    throw new Error(data.error ?? `${name} failed`);
+    const text = await response.text().catch(() => '');
+    throw new Error(text || `${name} failed (${response.status})`);
   }
 
-  return response.json();
+  return response.json() as Promise<T>;
 }
 
 export async function fetchEventByCode(code: string): Promise<EventPublicData> {
@@ -56,26 +60,22 @@ export async function checkParticipant(
 export async function registerParticipant(
   input: RegisterParticipantInput,
 ): Promise<RegisterParticipantResponse | AlreadyRegisteredResponse> {
-  const response = await fetch(
-    `${supabaseUrl}/functions/v1/register-participant`,
-    {
-      method: 'POST',
-      headers,
-      body: JSON.stringify(input),
-    },
-  );
-
-  const data = await response.json();
+  const response = await fetch(`${supabaseUrl}/functions/v1/register-participant`, {
+    method: 'POST',
+    headers: baseHeaders,
+    body: JSON.stringify(input),
+  });
 
   if (response.status === 409) {
-    return data as AlreadyRegisteredResponse;
+    return response.json() as Promise<AlreadyRegisteredResponse>;
   }
 
   if (!response.ok) {
-    throw new Error(data.error ?? 'Registration failed');
+    const text = await response.text().catch(() => '');
+    throw new Error(text || `Registration failed (${response.status})`);
   }
 
-  return data as RegisterParticipantResponse;
+  return response.json() as Promise<RegisterParticipantResponse>;
 }
 
 export async function uploadPhoto(
@@ -88,6 +88,7 @@ export async function uploadPhoto(
   formData.append('registration_id', registrationId);
   formData.append('event_id', eventId);
 
+  // No Content-Type header — browser sets multipart boundary automatically
   const response = await fetch(`${supabaseUrl}/functions/v1/upload-photo`, {
     method: 'POST',
     headers: { apikey: apiKey },
@@ -95,9 +96,9 @@ export async function uploadPhoto(
   });
 
   if (!response.ok) {
-    const data = await response.json().catch(() => ({}));
-    throw new Error(data.error ?? 'Photo upload failed');
+    const text = await response.text().catch(() => '');
+    throw new Error(text || `Photo upload failed (${response.status})`);
   }
 
-  return response.json();
+  return response.json() as Promise<UploadPhotoResponse>;
 }

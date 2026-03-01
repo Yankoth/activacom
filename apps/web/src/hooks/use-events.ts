@@ -10,7 +10,7 @@ import {
   archiveEvent,
   deleteEvent,
 } from '@/lib/api/events';
-import { eventKeys, type EventFilters } from '@/lib/query-keys';
+import { eventKeys, dashboardKeys, type EventFilters } from '@/lib/query-keys';
 import type { EventInsert, EventUpdate } from '@activacom/shared/types';
 
 export function useEvents(filters?: EventFilters) {
@@ -66,6 +66,7 @@ export function useActivateEvent() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.stats() });
       toast.success('Evento activado');
     },
     onError: (error: Error) => {
@@ -81,6 +82,7 @@ export function useCloseEvent() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.stats() });
       toast.success('Evento cerrado');
     },
     onError: (error: Error) => {
@@ -96,6 +98,7 @@ export function useArchiveEvent() {
     onSuccess: (data) => {
       queryClient.invalidateQueries({ queryKey: eventKeys.lists() });
       queryClient.invalidateQueries({ queryKey: eventKeys.detail(data.id) });
+      queryClient.invalidateQueries({ queryKey: dashboardKeys.stats() });
       toast.success('Evento archivado');
     },
     onError: (error: Error) => {
