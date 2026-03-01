@@ -79,6 +79,12 @@ export const displaySessionKeys = {
   list: (eventId: string) => [...displaySessionKeys.lists(), eventId] as const,
 };
 
+export const moderatorKeys = {
+  all: ['moderators'] as const,
+  lists: () => [...moderatorKeys.all, 'list'] as const,
+  list: (tenantId: string) => [...moderatorKeys.lists(), tenantId] as const,
+};
+
 export const contactKeys = {
   all: ['contacts'] as const,
   lists: () => [...contactKeys.all, 'list'] as const,

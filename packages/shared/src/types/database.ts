@@ -62,6 +62,7 @@ export interface Database {
           id: string;
           tenant_id: string;
           role: UserRole;
+          is_active: boolean;
           created_at: string;
           updated_at: string;
         };
@@ -69,12 +70,14 @@ export interface Database {
           id: string;
           tenant_id: string;
           role: UserRole;
+          is_active?: boolean;
           created_at?: string;
           updated_at?: string;
         };
         Update: {
           tenant_id?: string;
           role?: UserRole;
+          is_active?: boolean;
           updated_at?: string;
         };
         Relationships: [];
@@ -591,6 +594,10 @@ export interface Database {
         };
         Returns: string;
       };
+      get_tenant_moderators: {
+        Args: { p_tenant_id: string };
+        Returns: { id: string; email: string; role: string; is_active: boolean; created_at: string }[];
+      };
     };
   };
 }
@@ -785,4 +792,14 @@ export interface CreateFormFieldInput {
   contact_type?: ContactFieldType;
   options?: string[];
   sort_order: number;
+}
+
+export interface InviteModeratorInput {
+  email: string;
+}
+
+export interface InviteModeratorResponse {
+  success: true;
+  user_id: string;
+  email: string;
 }

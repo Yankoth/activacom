@@ -1,8 +1,8 @@
 import { lazy, Suspense } from 'react';
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { Loader2 } from 'lucide-react';
 import { Providers } from './components/providers';
-import { AuthGuard, RoleGuard } from './components/auth';
+import { AuthGuard, RoleGuard, RoleBasedRedirect } from './components/auth';
 import { AppLayout } from './components/layout';
 import { Toaster } from './components/ui/sonner';
 
@@ -17,6 +17,9 @@ const NewEventPage = lazy(() => import('./pages/events/new'));
 const EventDetailPage = lazy(() => import('./pages/events/detail'));
 const ContactsPage = lazy(() => import('./pages/contacts'));
 const SettingsPage = lazy(() => import('./pages/settings'));
+
+// Moderation page
+const ModeratorPage = lazy(() => import('./pages/moderation'));
 
 // Admin pages
 const AdminIndexPage = lazy(() => import('./pages/admin'));
@@ -51,12 +54,18 @@ export function App() {
                 </AuthGuard>
               }
             >
-              <Route path="/dashboard" element={<DashboardPage />} />
-              <Route path="/events" element={<EventsPage />} />
-              <Route path="/events/new" element={<NewEventPage />} />
-              <Route path="/events/:id" element={<EventDetailPage />} />
-              <Route path="/contacts" element={<ContactsPage />} />
-              <Route path="/settings" element={<SettingsPage />} />
+              {/* Tenant admin + super admin routes */}
+              <Route element={<RoleGuard allowedRoles={['tenant_admin', 'super_admin']} />}>
+                <Route path="/dashboard" element={<DashboardPage />} />
+                <Route path="/events" element={<EventsPage />} />
+                <Route path="/events/new" element={<NewEventPage />} />
+                <Route path="/events/:id" element={<EventDetailPage />} />
+                <Route path="/contacts" element={<ContactsPage />} />
+                <Route path="/settings" element={<SettingsPage />} />
+              </Route>
+
+              {/* Moderator page (accessible to all authenticated users) */}
+              <Route path="/moderate" element={<ModeratorPage />} />
 
               {/* Super admin routes */}
               <Route element={<RoleGuard allowedRoles={['super_admin']} />}>
@@ -69,8 +78,8 @@ export function App() {
             </Route>
 
             {/* Redirects */}
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="*" element={<Navigate to="/dashboard" replace />} />
+            <Route path="/" element={<RoleBasedRedirect />} />
+            <Route path="*" element={<RoleBasedRedirect />} />
           </Routes>
         </Suspense>
       </BrowserRouter>

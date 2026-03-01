@@ -1,5 +1,6 @@
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Skeleton } from '@/components/ui/skeleton';
+import { ModeratorsSection } from '@/components/settings/moderators-section';
 
 export default function SettingsPage() {
   return (
@@ -19,6 +20,8 @@ export default function SettingsPage() {
           ))}
         </CardContent>
       </Card>
+
+      <ModeratorsSection />
     </div>
   );
 }

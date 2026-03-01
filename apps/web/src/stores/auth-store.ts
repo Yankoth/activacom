@@ -108,12 +108,19 @@ export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
           return;
         }
 
+        if (retryData && !retryData.is_active) {
+          console.error('[auth] User account is deactivated');
+          await supabase.auth.signOut();
+          return;
+        }
+
         const tenant = (retryData as unknown as { tenants: Tenant }).tenants;
         set({
           user: {
             id: retryData.id,
             tenant_id: retryData.tenant_id,
             role: retryData.role,
+            is_active: retryData.is_active,
             created_at: retryData.created_at,
             updated_at: retryData.updated_at,
           },
@@ -128,6 +135,12 @@ export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
       return;
     }
 
+    if (data && !data.is_active) {
+      console.error('[auth] User account is deactivated');
+      await supabase.auth.signOut();
+      return;
+    }
+
     const tenant = (data as unknown as { tenants: Tenant }).tenants;
 
     set({
@@ -135,6 +148,7 @@ export const useAuthStore = create<AuthState & AuthActions>()((set, get) => ({
         id: data.id,
         tenant_id: data.tenant_id,
         role: data.role,
+        is_active: data.is_active,
         created_at: data.created_at,
         updated_at: data.updated_at,
       },

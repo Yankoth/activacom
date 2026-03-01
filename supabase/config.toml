@@ -41,3 +41,7 @@ verify_jwt = false
 [functions.display-heartbeat]
 enabled = true
 verify_jwt = false
+
+[functions.invite-moderator]
+enabled = true
+verify_jwt = false

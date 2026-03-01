@@ -44,6 +44,10 @@ const mainNavItems = [
   { title: 'Configuracion', url: '/settings', icon: Settings },
 ];
 
+const moderatorNavItems = [
+  { title: 'Moderacion', url: '/moderate', icon: ImageIcon },
+];
+
 const adminNavItems = [
   { title: 'Tenants', url: '/admin/tenants', icon: Building2 },
   { title: 'Publicidad', url: '/admin/ads', icon: ImageIcon },
@@ -54,8 +58,11 @@ export function AppSidebar() {
   const location = useLocation();
   const { tenant, role, signOut } = useAuthStore();
 
+  const navItems = role === 'moderator' ? moderatorNavItems : mainNavItems;
+
   const isActive = (url: string) => {
     if (url === '/dashboard') return location.pathname === '/dashboard';
+    if (url === '/moderate') return location.pathname === '/moderate';
     return location.pathname.startsWith(url);
   };
 
@@ -74,7 +81,7 @@ export function AppSidebar() {
         <SidebarMenu>
           <SidebarMenuItem>
             <SidebarMenuButton size="lg" asChild>
-              <Link to="/dashboard">
+              <Link to={role === 'moderator' ? '/moderate' : '/dashboard'}>
                 <div className="bg-primary text-primary-foreground flex aspect-square size-8 items-center justify-center rounded-lg">
                   <Zap className="size-4" />
                 </div>
@@ -95,7 +102,7 @@ export function AppSidebar() {
           <SidebarGroupLabel>Menu</SidebarGroupLabel>
           <SidebarGroupContent>
             <SidebarMenu>
-              {mainNavItems.map((item) => (
+              {navItems.map((item) => (
                 <SidebarMenuItem key={item.title}>
                   <SidebarMenuButton
                     asChild={!item.disabled}
