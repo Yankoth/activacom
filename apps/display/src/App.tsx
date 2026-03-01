@@ -67,6 +67,7 @@ export function App() {
       <DisplayScreen
         sessionToken={sessionToken}
         event={event}
+        eventCode={eventCode!}
         onSessionExpired={handleSessionExpired}
       />
     );

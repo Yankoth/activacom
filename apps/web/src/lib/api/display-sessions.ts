@@ -1,4 +1,4 @@
-import type { DisplaySession } from '@activacom/shared/types';
+import type { DisplaySession, DisplayEventState } from '@activacom/shared/types';
 import { DEVICE_CODE_EXPIRY } from '@activacom/shared/constants';
 import { supabase } from '@/lib/supabase';
 
@@ -47,4 +47,20 @@ export async function revokeDisplaySession(sessionId: string): Promise<void> {
     .eq('id', sessionId);
 
   if (error) throw error;
+}
+
+export async function broadcastDisplayState(
+  eventId: string,
+  state: DisplayEventState,
+): Promise<void> {
+  const channel = supabase.channel(`display-state:${eventId}`);
+
+  await channel.subscribe();
+  await channel.send({
+    type: 'broadcast',
+    event: 'display_state',
+    payload: state,
+  });
+
+  supabase.removeChannel(channel);
 }

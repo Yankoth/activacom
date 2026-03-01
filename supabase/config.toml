@@ -33,3 +33,11 @@ verify_jwt = false
 [functions.upload-photo]
 enabled = true
 verify_jwt = false
+
+[functions.authorize-display]
+enabled = true
+verify_jwt = false
+
+[functions.display-heartbeat]
+enabled = true
+verify_jwt = false

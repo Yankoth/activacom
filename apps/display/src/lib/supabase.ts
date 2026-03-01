@@ -119,6 +119,29 @@ export function subscribeToPhotos(
   };
 }
 
+// ── Data fetching ───────────────────────────────────────────────────────────
+
+export async function getApprovedPhotos(eventId: string): Promise<Photo[]> {
+  const { data, error } = await supabase
+    .from('photos')
+    .select('*')
+    .eq('event_id', eventId)
+    .eq('status', 'approved')
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error('Failed to fetch approved photos:', error);
+    return [];
+  }
+  return data ?? [];
+}
+
+export function getPhotoPublicUrl(storagePath: string): string {
+  return supabase.storage.from('photos').getPublicUrl(storagePath).data.publicUrl;
+}
+
+// ── Realtime subscriptions ──────────────────────────────────────────────────
+
 export function subscribeToEventState(
   eventId: string,
   callback: (state: DisplayEventState) => void,
